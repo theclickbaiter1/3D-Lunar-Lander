@@ -1,0 +1,87 @@
+<mujoco model="LunarLander3D">
+    <option timestep="0.02" gravity="0 0 -1.62"/> <!-- Lunar gravity -->
+    <compiler angle="degree" coordinate="local"/>
+
+    <visual>
+        <global offwidth="800" offheight="600"/>
+        <map force="0.1" zfar="30"/>
+    </visual>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0 0 0" rgb2="0.1 0.1 0.2" width="512" height="512"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.2 0.2 0.2" rgb2="0.3 0.3 0.3" width="512" height="512"/>
+        <material name="grid" texture="grid" texrepeat="5 5" reflectance="0.2"/>
+        <material name="lander_mat" rgba="0.8 0.6 0.1 1" reflectance="0.5"/>
+        <material name="pad_mat" rgba="0.1 0.4 0.9 1"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10" dir="0 0 -1" diffuse="0.8 0.8 0.8" specular="0.3 0.3 0.3"/>
+        <geom name="ground" type="plane" pos="0 0 0" size="20 20 0.1" material="grid" friction="1 0.005 0.0001"/>
+        
+        <!-- Landing Pad -->
+        <geom name="landing_pad" type="cylinder" pos="0 0 0.01" size="2 0.05" material="pad_mat" contype="1" conaffinity="1"/>
+
+        <!-- Lander Body -->
+        <body name="lander" pos="0 0 5">
+            <freejoint name="root"/>
+            
+            <!-- Descent Stage (Gold Octagon-like base) -->
+            <geom name="descent_base" type="box" size="0.35 0.35 0.25" pos="0 0 -0.2" material="lander_mat" mass="60"/>
+            <geom name="descent_core" type="cylinder" size="0.45 0.25" pos="0 0 -0.2" material="lander_mat" mass="10"/>
+            
+            <!-- Ascent Stage (Silver spherical cabin) -->
+            <geom name="ascent_cabin" type="sphere" size="0.35" pos="0 0 0.2" rgba="0.75 0.75 0.8 1" mass="30"/>
+            <geom name="window" type="cylinder" size="0.15 0.05" pos="0.3 0 0.2" quat="0.707 0 0.707 0" rgba="0.1 0.1 0.1 1" mass="0"/>
+            
+            <!-- Communications/Instruments -->
+            <geom name="antenna" type="cylinder" size="0.01 0.2" pos="-0.1 0.2 0.6" rgba="0.2 0.2 0.2 1" mass="0"/>
+            <geom name="dish" type="ellipsoid" size="0.12 0.12 0.02" pos="-0.1 0.2 0.8" quat="0.92388 0.38268 0 0" rgba="0.9 0.9 0.9 1" mass="0"/>
+            <geom name="sensor" type="box" size="0.05 0.05 0.05" pos="0 -0.3 0.4" rgba="0.3 0.3 0.3 1" mass="0"/>
+
+            <!-- Legs & Footpads -->
+            <body name="leg_body_1" pos="0.35 0.35 -0.6" euler="45 -45 0">
+                <site name="leg_1_joint" pos="0 0 0" size="0.01"/>
+                <geom name="leg_1" type="capsule" pos="0 0 0" size="0.04 0.3" rgba="0.6 0.6 0.6 1"/>
+                <geom name="foot_1" type="cylinder" pos="0 0 -0.3" size="0.12 0.02" rgba="0.2 0.2 0.2 1"/>
+            </body>
+            <body name="leg_body_2" pos="-0.35 -0.35 -0.6" euler="-45 45 0">
+                <geom name="leg_2" type="capsule" pos="0 0 0" size="0.04 0.3" rgba="0.6 0.6 0.6 1"/>
+                <geom name="foot_2" type="cylinder" pos="0 0 -0.3" size="0.12 0.02" rgba="0.2 0.2 0.2 1"/>
+            </body>
+            <body name="leg_body_3" pos="-0.35 0.35 -0.6" euler="45 45 0">
+                <geom name="leg_3" type="capsule" pos="0 0 0" size="0.04 0.3" rgba="0.6 0.6 0.6 1"/>
+                <geom name="foot_3" type="cylinder" pos="0 0 -0.3" size="0.12 0.02" rgba="0.2 0.2 0.2 1"/>
+            </body>
+            <body name="leg_body_4" pos="0.35 -0.35 -0.6" euler="-45 -45 0">
+                <geom name="leg_4" type="capsule" pos="0 0 0" size="0.04 0.3" rgba="0.6 0.6 0.6 1"/>
+                <geom name="foot_4" type="cylinder" pos="0 0 -0.3" size="0.12 0.02" rgba="0.2 0.2 0.2 1"/>
+            </body>
+
+            <!-- Sites (anchors for actuators) -->
+            <site name="main_thruster" pos="0 0 -0.5" type="cylinder" size="0.12 0.01" rgba="1 0 0 1"/>
+            <site name="north_thruster" pos="0 0.45 0.2" type="sphere" size="0.05" rgba="1 0 0 1"/>
+            <site name="south_thruster" pos="0 -0.45 0.2" type="sphere" size="0.05" rgba="1 0 0 1"/>
+            <site name="east_thruster" pos="0.45 0 0.2" type="sphere" size="0.05" rgba="1 0 0 1"/>
+            <site name="west_thruster" pos="-0.45 0 0.2" type="sphere" size="0.05" rgba="1 0 0 1"/>
+            
+            <!-- Plume Visuals -->
+            <geom name="main_plume" type="capsule" pos="0 0 -0.8" size="0.08 0.2" rgba="1 0.5 0 0" contype="0" conaffinity="0"/>
+            <geom name="north_plume" type="capsule" pos="0 0.55 0.2" quat="0.707 0.707 0 0" size="0.03 0.1" rgba="1 0.5 0 0" contype="0" conaffinity="0"/>
+            <geom name="south_plume" type="capsule" pos="0 -0.55 0.2" quat="0.707 -0.707 0 0" size="0.03 0.1" rgba="1 0.5 0 0" contype="0" conaffinity="0"/>
+            <geom name="east_plume" type="capsule" pos="0.55 0 0.2" quat="0.707 0 0.707 0" size="0.03 0.1" rgba="1 0.5 0 0" contype="0" conaffinity="0"/>
+            <geom name="west_plume" type="capsule" pos="-0.55 0 0.2" quat="0.707 0 -0.707 0" size="0.03 0.1" rgba="1 0.5 0 0" contype="0" conaffinity="0"/>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <!-- Gear vector for force: [fx, fy, fz, tx, ty, tz] in site's local frame. -->
+        <general name="main_engine" site="main_thruster" gear="0 0 1 0 0 0" ctrllimited="true" ctrlrange="0 300"/>
+        
+        <!-- Side thrusters -->
+        <general name="north_engine" site="north_thruster" gear="0 -1 0 0 0 0" ctrllimited="true" ctrlrange="0 50"/>
+        <general name="south_engine" site="south_thruster" gear="0 1 0 0 0 0" ctrllimited="true" ctrlrange="0 50"/>
+        <general name="east_engine" site="east_thruster" gear="-1 0 0 0 0 0" ctrllimited="true" ctrlrange="0 50"/>
+        <general name="west_engine" site="west_thruster" gear="1 0 0 0 0 0" ctrllimited="true" ctrlrange="0 50"/>
+    </actuator>
+</mujoco>
